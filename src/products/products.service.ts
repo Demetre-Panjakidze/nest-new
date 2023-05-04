@@ -5,8 +5,6 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class ProductsService {
-  private products: Product[] = [];
-
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
   ) {}
@@ -55,7 +53,15 @@ export class ProductsService {
   }
 
   async deleteProduct(prodId: string) {
-    const result = await this.productModel.deleteOne({ _id: prodId }).exec();
+    let result;
+    try {
+      result = await this.productModel.deleteOne({ _id: prodId }).exec();
+    } catch {
+      throw new NotFoundException('Something went wrong');
+    }
+    if (!result) {
+      throw new NotFoundException('Something went wrong');
+    }
     console.log(result);
   }
 
